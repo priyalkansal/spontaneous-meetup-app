@@ -1,0 +1,124 @@
+import React from 'react';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useRouter } from 'expo-router';
+import { ChatPreview } from '@/types';
+import Colors from '@/constants/colors';
+
+type ChatPreviewCardProps = {
+  chat: ChatPreview;
+};
+
+export default function ChatPreviewCard({ chat }: ChatPreviewCardProps) {
+  const router = useRouter();
+  
+  const handlePress = () => {
+    // Route to group chat if it's a group, otherwise to DM chat
+    if (chat.isGroupChat) {
+      router.push(`/group-chat/${chat.userId}`);
+    } else {
+      router.push(`/chat/${chat.userId}`);
+    }
+  };
+  
+  const formatTime = (timestamp: string) => {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.round(diffMs / 60000);
+    
+    if (diffMins < 1) return 'now';
+    if (diffMins < 60) return `${diffMins}m`;
+    if (diffMins < 1440) return `${Math.floor(diffMins / 60)}h`;
+    return `${Math.floor(diffMins / 1440)}d`;
+  };
+  
+  return (
+    <TouchableOpacity 
+      style={styles.container}
+      onPress={handlePress}
+      activeOpacity={0.7}
+    >
+      <View style={styles.avatarContainer}>
+        <Image source={{ uri: chat.avatar }} style={styles.avatar} />
+      </View>
+      
+      <View style={styles.contentContainer}>
+        <View style={styles.headerContainer}>
+          <Text style={styles.name}>{chat.name}</Text>
+          <Text style={styles.time}>{formatTime(chat.timestamp)}</Text>
+        </View>
+        
+        <View style={styles.messageContainer}>
+          <Text style={styles.message} numberOfLines={1}>
+            {chat.lastMessage}
+          </Text>
+          
+          {chat.unread > 0 && (
+            <View style={styles.unreadBadge}>
+              <Text style={styles.unreadText}>{chat.unread}</Text>
+            </View>
+          )}
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.lightGray,
+  },
+  avatarContainer: {
+    marginRight: 12,
+  },
+  avatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+  },
+  contentContainer: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  name: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: Colors.black,
+  },
+  time: {
+    fontSize: 12,
+    color: Colors.darkGray,
+  },
+  messageContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  message: {
+    flex: 1,
+    fontSize: 14,
+    color: Colors.darkGray,
+  },
+  unreadBadge: {
+    backgroundColor: Colors.primary,
+    borderRadius: 10,
+    width: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 8,
+  },
+  unreadText: {
+    color: Colors.white,
+    fontSize: 12,
+    fontWeight: 'bold',
+  },
+});
