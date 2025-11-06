@@ -9,7 +9,7 @@ interface ActivityDetailsModalProps {
   visible: boolean;
   activity: Group | null;
   onClose: () => void;
-  onJoin: () => void;
+  onJoin: () => void; 
   onLeave: () => void;
   isUserMember: boolean;
   currentUserId: string;
