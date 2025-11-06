@@ -12,3 +12,4 @@ export default function SplashScreen() {
   return <SplashScreenComponent onAnimationComplete={handleAnimationComplete} />;
 }
 
+  
